@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Payment DApp</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <meta name="viewport" content="width=device-width, initial-scale=1" /> 
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script type="text/javascript">
+      var Web3;
+      const web3 = new Web3("http://127.0.0.1:7545");  // RPC URL for Ganache
+      const contractAddress = "0x3e94D365582DB93E23524bDCc58fba8990153377"; // Contract address
+      
+      const contract = new web3.eth.Contract([
+        {
+          "inputs": [],
+          "name": "myString",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "constant": true,
+          "inputs": [],
+          "name": "myValue",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "constant": false,
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "_myValue",
+              "type": "uint256"
+            }
+          ],
+          "name": "setValue",
+          "outputs": [],
+          "payable": false,
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "constant": false,
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "_myString",
+              "type": "string"
+            }
+          ],
+          "name": "setString",
+          "outputs": [],
+          "payable": false,
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ], contractAddress);
+      
+      async function deposit() {
+        const amount = document.getElementById("depositAmount").value;
+        await contract.methods.setValue(amount).send({from: "0x8Bb3B5BD8c400958fF8CDBF4801b159Cc7c12986"}); // Sender address
+        alert("Deposit successful!");
+      }
+      
+      async function checkAccountBalance() {
+        const balance = await contract.methods.myValue().call();
+        alert("Account balance: " + balance);
+      }
+      
+      async function checkContractBalance() {
+        const balance = await web3.eth.getBalance(contractAddress);
+        alert("Contract balance: " + web3.utils.fromWei(balance, "ether") + " ETH");
+      }
+      
+      async function transfer() {
+        const recipient = document.getElementById("transferRecipient").value;
+        const amount = document.getElementById("transferAmount").value;
+        const memo = document.getElementById("transferMemo").value;
+        await contract.methods.setValue(amount).send({from: "0x8Bb3B5BD8c400958fF8CDBF4801b159Cc7c12986", to: recipient}); // Sender address
+        alert("Transfer successful!");
+      }
+    </script>
+</head>
+<body>
+    <h2>Simple Payment DApp</h2>
+    
+    <h3>Deposit</h3>
+    <input type="number" id="depositAmount" placeholder="Enter deposit amount in ETH" step="0.01"></input>
+    <button onclick="deposit()">Deposit</button>
+    
+    <h3>Check Account Balance</h3>
+    <input type="text" id="accountAddress" placeholder="Enter account address"></input>
+    <button onclick="checkAccountBalance()">Check Account Balance</button>
+    <p id="accountBalance"></p>
+
+    <h3>Check Contract Balance</h3>
+    <button onclick="checkContractBalance()">Check Contract Balance</button>
+    <p id="contractBalance"></p>
+
+    <h3>Transfer</h3>
+    <input type="text" id="transferRecipient" placeholder="Enter recipient address"></input>
+    <input type="number" id="transferAmount" placeholder="Enter transfer amount in ETH" step="0.01"></input>
+    <input type="text" id="transferMemo" placeholder="Enter memo"></input>
+    <button onclick="transfer()">Transfer</button>
+
+</body>
+</html>
